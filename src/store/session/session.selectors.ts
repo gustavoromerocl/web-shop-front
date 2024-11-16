@@ -8,4 +8,7 @@ export const selectIsLoggedIn = createSelector(
   (state) => state.isLoggedIn
 );
 
-export const selectUser = createSelector(selectSessionState, (state) => state.user);
+export const selectUser = createSelector(
+  selectSessionState,
+  (state) => state.user
+);
