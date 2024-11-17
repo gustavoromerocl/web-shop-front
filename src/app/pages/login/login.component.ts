@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { login } from '../../../store/session/session.reducer';
+import { login } from '../../store/session/session.reducer';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -28,7 +28,7 @@ export class LoginComponent {
   navigateToRegister() {
     this.router.navigate(['/register']);
   }
-  
+
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;

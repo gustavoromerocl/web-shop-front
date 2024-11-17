@@ -3,7 +3,7 @@ import { CanActivate, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { selectIsLoggedIn } from '../../store/session/session.selectors';
+import { selectIsLoggedIn } from '../store/session/session.selectors';
 
 
 @Injectable({

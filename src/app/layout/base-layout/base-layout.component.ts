@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { selectUser } from '../../../store/session/session.selectors';
-import { logout } from '../../../store/session/session.reducer';
+import { selectUser } from '../../store/session/session.selectors';
+import { logout } from '../../store/session/session.reducer';
 
 @Component({
   selector: 'app-base-layout',

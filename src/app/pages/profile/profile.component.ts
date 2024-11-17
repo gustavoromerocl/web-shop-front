@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { selectUser } from '../../../store/session/session.selectors';
-import { updateUser } from '../../../store/session/session.reducer';
+import { selectUser } from '../../store/session/session.selectors';
+import { updateUser } from '../../store/session/session.reducer';
 
 @Component({
   selector: 'app-profile',

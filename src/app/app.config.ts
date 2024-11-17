@@ -5,8 +5,8 @@ import { routes } from './app.routes';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { sessionReducer } from '../store/session/session.reducer';
-import { productsReducer } from '../store/products/products.reducer';
+import { sessionReducer } from './store/session/session.reducer';
+import { productsReducer } from './store/products/products.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
