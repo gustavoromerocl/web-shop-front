@@ -27,3 +27,9 @@ button {
 button:disabled {
   background-color: #ccc;
 }
+
+.text-decoration-underline {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #007bff;
+}

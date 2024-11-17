@@ -25,6 +25,10 @@ export class LoginComponent {
     });
   }
 
+  navigateToRegister() {
+    this.router.navigate(['/register']);
+  }
+  
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
