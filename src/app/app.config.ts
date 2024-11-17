@@ -6,7 +6,7 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { sessionReducer } from './store/session/session.reducer';
-import { productsReducer } from './store/products/products.reducer';
+import { productsReducer } from './store/products/product.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
