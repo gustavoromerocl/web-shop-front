@@ -31,6 +31,10 @@ export class LoginComponent {
     this.router.navigate(['/register']);
   }
 
+  navigateToRecoverPassword() {
+    this.router.navigate(['recover-password'])
+  }
+
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
