@@ -9,6 +9,11 @@ export const routes: Routes = [
     component: BaseLayoutComponent,
     children: [
       {
+        path: '',
+        pathMatch: 'full', // Redirección desde la raíz
+        redirectTo: 'home', // Redirige a home
+      },
+      {
         path: 'home',
         loadComponent: () =>
           import('./pages/home/home.component').then((m) => m.HomeComponent),

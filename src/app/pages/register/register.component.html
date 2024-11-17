@@ -48,12 +48,26 @@
       />
       <div
         *ngIf="
-          registerForm.get('password')?.invalid &&
+          registerForm.get('password')?.errors &&
           registerForm.get('password')?.touched
         "
         class="text-danger"
       >
-        Password must be at least 6 characters.
+        <div *ngIf="registerForm.get('password')?.errors?.['required']">
+          Password is required.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['minlength']">
+          Password must be at least 6 characters.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['uppercase']">
+          Password must contain at least one uppercase letter.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['number']">
+          Password must contain at least one number.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['specialCharacter']">
+          Password must contain at least one special character.
+        </div>
       </div>
     </div>
 
