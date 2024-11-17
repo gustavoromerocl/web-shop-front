@@ -1,19 +1,23 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UserService } from '../../services/user/user.service'; // Importa el servicio
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
 })
 export class RegisterComponent {
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService, // Inyecta el servicio
+    private router: Router
+  ) {
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -36,9 +40,11 @@ export class RegisterComponent {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      console.log('User registered:', this.registerForm.value);
+      const { name, email, password } = this.registerForm.value;
+      const newUser = { id: Date.now().toString(), name, email, password };
+      this.userService.registerUser(newUser); // Guarda el usuario en memoria
       alert('Registration successful!');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login']); // Redirige al login
     }
   }
 }

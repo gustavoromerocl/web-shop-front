@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { login } from '../../store/session/session.reducer';
+import { UserService } from '../../services//user/user.service';
 import { CommonModule } from '@angular/common';
+import { login } from '../../store/session/session.reducer';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private store: Store,
+    private userService: UserService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -32,19 +34,18 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-
-      // Simular validación de credenciales
-      if (email === 'user@example.com' && password === 'password123') {
-        this.store.dispatch(
-          login({ user: {
-            id: '1', name: 'John Doe', role: 'user',
-            email: 'user@example.com'
-          } })
-        );
-        this.router.navigate(['/home']); // Redirige a la ruta home
+  
+      // Encuentra al usuario con el servicio
+      const user = this.userService.findUser(email, password);
+  
+      if (user) {
+        // Asegúrate de que todos los campos necesarios estén definidos
+        this.store.dispatch(login({ user: { ...user, role: user.role || 'ROLE_USER' } }));
+        this.router.navigate(['/home']); // Redirige a home
       } else {
-        alert('Invalid credentials');
+        alert('Invalid email or password.');
       }
     }
   }
+  
 }

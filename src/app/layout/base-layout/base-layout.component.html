@@ -17,6 +17,12 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/home">Home</a>
         </li>
+        <ng-container *ngIf="user$ | async as user">
+          <!-- Mostrar Profile solo si user está autenticado -->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/profile">Profile</a>
+          </li>
+        </ng-container>
       </ul>
 
       <!-- Lógica dinámica para Iniciar Sesión/Logout -->
