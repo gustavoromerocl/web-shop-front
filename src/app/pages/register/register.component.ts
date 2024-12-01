@@ -1,5 +1,13 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  ValidatorFn,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user/user.service'; // Importa el servicio
 import { CommonModule } from '@angular/common';
@@ -77,10 +85,20 @@ export class RegisterComponent {
   onSubmit() {
     if (this.registerForm.valid) {
       const { name, email, password } = this.registerForm.value;
-      const newUser = { id: Date.now().toString(), name, email, password };
-      this.userService.registerUser(newUser); // Guarda el usuario en memoria
-      alert('Registration successful!');
-      this.router.navigate(['/login']); // Redirige al login
+      const newUser = { username: name, email, password };
+  
+      this.userService.registerUser(newUser).subscribe({
+        next: (response) => {
+          console.log('Registration Response:', response); // Verifica la respuesta en consola
+          alert('Registration successful!');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          console.error('Error Details:', err); // Imprime el error completo
+          alert('Registration failed. Please try again.');
+        },
+      });
     }
   }
+  
 }

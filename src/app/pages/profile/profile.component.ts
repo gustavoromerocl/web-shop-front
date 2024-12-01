@@ -15,7 +15,7 @@ import { updateUser } from '../../store/session/session.reducer';
 })
 export class ProfileComponent {
   profileForm: FormGroup;
-  user$: Observable<{ id: string; name: string; email: string } | null>;
+  user$: Observable<{ id: string; name?: string; email: string } | null>;
 
   constructor(private fb: FormBuilder, private store: Store) {
     this.user$ = this.store.select(selectUser);
