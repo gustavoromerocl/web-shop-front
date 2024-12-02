@@ -38,17 +38,45 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
+      this.userService.login(email, password).subscribe({
+        next: (response) => {
+          console.log('Login Response:', response);
+          localStorage.setItem('token', response.token); // Guarda el token
   
+          // Llama a getProfile
+          this.userService.getProfile().subscribe({
+            next: (user) => {
+              console.log('User Profile:', user);
+              this.store.dispatch(login({ user: { 
+                id: user.id, 
+                name: user.username, 
+                email: user.email, 
+                role: user.roles[0].name || 'ROLE_USER' 
+              }}));
+              // alert(`Bienvenido, ${profile.name || 'Usuario'}`);
+              this.router.navigate(['/home']);
+            },
+            error: (err) => {
+              console.error('Error fetching profile:', err);
+              alert('Failed to fetch profile. Please try again.');
+            },
+          });
+        },
+        error: (err) => {
+          console.error('Error Details:', err);
+          alert('Login failed. Please try again.');
+        },
+      });
       // Encuentra al usuario con el servicio
       const user = this.userService.findUser(email, password);
   
-      if (user) {
-        // Asegúrate de que todos los campos necesarios estén definidos
-        this.store.dispatch(login({ user: { ...user, role: user.role || 'ROLE_USER' } }));
-        this.router.navigate(['/home']); // Redirige a home
-      } else {
-        alert('Invalid email or password.');
-      }
+      // if (user) {
+      //   // Asegúrate de que todos los campos necesarios estén definidos
+      //   this.store.dispatch(login({ user: { ...user, role: user.role || 'ROLE_USER' } }));
+      //   this.router.navigate(['/home']); // Redirige a home
+      // } else {
+      //   alert('Invalid email or password.');
+      // }
     }
   }
   

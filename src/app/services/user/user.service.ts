@@ -24,6 +24,20 @@ export class UserService {
   const url = `${this.apiUrl}/auth/signup`;
   return this.http.post<User>(url, user, { observe: 'response' });
   }
+
+  login(email: string, password: string) {
+    const url = `${this.apiUrl}/auth/login`;
+    return this.http.post<any>(url, { email, password})
+  }
+
+  getProfile(): Observable<any> {
+    const url = `${this.apiUrl}/users/profile`;
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.get<any>(url, { headers });
+  }
+  
+
   // Devuelve el usuario sin la contraseña
   findUser(email: string, password: string): Omit<User, 'password'> | null {
     const user = this.users.find(
