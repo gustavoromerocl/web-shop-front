@@ -14,7 +14,7 @@ import { logout } from '../../store/session/session.reducer';
   imports: [RouterModule, CommonModule],
 })
 export class BaseLayoutComponent {
-  user$: Observable<{ id: string; name: string; role: string; email: string } | null>;
+  user$: Observable<{ id: string; name?: string; role: string; email: string } | null>;
 
   constructor(private store: Store, private router: Router) {
     this.user$ = this.store.select(selectUser);

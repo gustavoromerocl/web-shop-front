@@ -3,7 +3,7 @@ import { createAction, props } from '@ngrx/store';
 
 export const login = createAction(
   '[Session] Login',
-  props<{ user: { id: string; name: string; role: string; email: string } }>()
+  props<{ user: { id: string; name?: string; role: string; email: string } }>()
 );
 
 export const logout = createAction('[Session] Logout');
@@ -15,7 +15,7 @@ export const updateUser = createAction(
 
 export interface SessionState {
   isLoggedIn: boolean;
-  user: { id: string; name: string; role: string; email: string } | null;
+  user: { id: string; name?: string; role: string; email: string } | null;
 }
 
 export const initialState: SessionState = {
