@@ -6,8 +6,11 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "jasmine",
-      "@angular/localize"
-    ]
+      "@angular/localize",
+      "node"
+    ],
+    "emitDecoratorMetadata": true,
+    "sourceMap": true
   },
   "include": [
     "src/**/*.spec.ts",
