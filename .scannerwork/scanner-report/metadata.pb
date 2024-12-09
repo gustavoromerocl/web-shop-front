@@ -1,4 +1,4 @@
-¨öóÔº2web-shop-front(:R
+øìº2web-shop-front(:R
 
 kubernetesD
 $b5f25413-55b4-4529-8fd8-2d54d5c4bb94	Sonar way
@@ -68,4 +68,4 @@ $5e105a40-c4dd-4bec-84dd-9ff50f4c126d	Sonar wayts ¨ÇîŠ´2B
 
 javascript
 
-javascript ÉîŠ´2j(f0a6b77f8370453e19488e7a391632687e6599b7
+javascript ÉîŠ´2j(4c873ce397ce69fbdfb292a0f66ce9911c6aea2d

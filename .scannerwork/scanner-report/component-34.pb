@@ -1,1 +1,1 @@
-" 2webXhrsrc/index.html
+" 2tsXhrsrc/app/app.config.ts

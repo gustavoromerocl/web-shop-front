@@ -1,1 +1,1 @@
- 2cssXhr%src/app/pages/home/home.component.css
+ 2cssXhr%src/app/pages/cart/cart.component.css

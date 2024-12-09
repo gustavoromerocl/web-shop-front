@@ -1,1 +1,1 @@
- 2cssX$hr'src/app/pages/login/login.component.css
+ 2webX@hr(src/app/pages/login/login.component.html

@@ -16,7 +16,7 @@ import { CartService } from '../../services/cart/cart.service';
 export class HomeComponent implements OnInit {
   products$: Observable<Product[]>;
 
-  constructor(private store: Store, private cartService: CartService) {
+  constructor(private readonly store: Store, private readonly cartService: CartService) {
     this.products$ = this.store.select(selectAllProducts);
   }
 

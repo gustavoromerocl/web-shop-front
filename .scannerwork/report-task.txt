@@ -2,5 +2,5 @@ projectKey=web-shop-front
 serverUrl=http://localhost:9000
 serverVersion=10.7.0.96327
 dashboardUrl=http://localhost:9000/dashboard?id=web-shop-front
-ceTaskId=c46a4d8c-f2b8-4888-886d-032a1737ea36
-ceTaskUrl=http://localhost:9000/api/ce/task?id=c46a4d8c-f2b8-4888-886d-032a1737ea36
+ceTaskId=262278fe-08d1-4f67-951d-b3175414e82e
+ceTaskUrl=http://localhost:9000/api/ce/task?id=262278fe-08d1-4f67-951d-b3175414e82e

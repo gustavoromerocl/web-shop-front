@@ -1,1 +1,1 @@
-  2tsXhr3src/app/layout/base-layout/base-layout.component.ts
+  2cssXhr%src/app/pages/home/home.component.css

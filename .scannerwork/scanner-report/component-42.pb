@@ -1,1 +1,1 @@
-* (2tsXJhr/src/app/pages/profile/profile.component.spec.ts
+* (2tsX–hr0src/app/services/product/product.service.spec.ts

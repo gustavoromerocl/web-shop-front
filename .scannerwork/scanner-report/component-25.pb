@@ -1,1 +1,1 @@
- 2webXhr&src/app/pages/home/home.component.html
+ 2webX1hr,src/app/pages/profile/profile.component.html

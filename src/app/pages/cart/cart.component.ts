@@ -6,7 +6,6 @@ import { CartItem, CartService } from '../../services/cart/cart.service';
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css'],
   standalone: true,
   imports: [CommonModule],
 })
@@ -14,7 +13,7 @@ export class CartComponent implements OnInit {
   cartItems: CartItem[] = [];
   orderDetail: OrderResponse | null = null;
 
-  constructor(private cartService: CartService, private orderService: OrderService) {}
+  constructor(private readonly cartService: CartService, private readonly orderService: OrderService) {}
 
   ngOnInit(): void {
     this.loadCart();

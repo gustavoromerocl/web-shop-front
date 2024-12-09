@@ -1,1 +1,1 @@
-% (2tsXZhr0src/app/services/product/product.service.spec.ts
+% 2tsXhr3src/app/layout/base-layout/base-layout.component.ts

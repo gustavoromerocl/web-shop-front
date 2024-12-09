@@ -1,1 +1,1 @@
- 2cssXhrsrc/app/app.component.css
+ 2tsXhr)src/app/store/products/product.effects.ts

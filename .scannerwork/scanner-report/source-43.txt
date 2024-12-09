@@ -1,66 +1,79 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HomeComponent } from './home.component';
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { selectAllProducts } from '../../store/products/product.selectors';
-import { loadProducts, Product } from '../../store/products/product.reducer';
-import { of } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { OrderService, OrderRequest, OrderResponse } from './order.service';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
-  let store: MockStore;
+describe('OrderService', () => {
+  let service: OrderService;
+  let httpTestingController: HttpTestingController;
 
-  const mockProducts: Product[] = [
-    {
-      id: '1',
-      name: 'Product 1',
-      price: 100,
-      stock: 10,
-      imageUrl: 'https://example.com/image1.jpg',
-      category: 'Electronics',
-    },
-    {
-      id: '2',
-      name: 'Product 2',
-      price: 200,
-      stock: 5,
-      imageUrl: 'https://example.com/image2.jpg',
-      category: 'Home',
-    },
-  ];
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [HomeComponent],
-      providers: [
-        provideMockStore({
-          selectors: [
-            { selector: selectAllProducts, value: mockProducts },
-          ],
-        }),
-      ],
-    }).compileComponents();
-
-    store = TestBed.inject(MockStore);
-    fixture = TestBed.createComponent(HomeComponent);
-    component = fixture.componentInstance;
-
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should select all products from the store', (done) => {
-    component.products$.subscribe((products) => {
-      expect(products).toEqual(mockProducts);
-      done();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [OrderService],
     });
+
+    service = TestBed.inject(OrderService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
-  it('should dispatch loadProducts on initialization', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(loadProducts());
+  afterEach(() => {
+    httpTestingController.verify(); // Verifica que no queden solicitudes pendientes
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('createOrder', () => {
+    it('should send a POST request to create an order and return the response', () => {
+      const mockOrderRequest: OrderRequest = {
+        products: [
+          { productId: 1, quantity: 2 },
+          { productId: 2, quantity: 1 },
+        ],
+      };
+
+      const mockOrderResponse: OrderResponse = {
+        id: 1,
+        orderNumber: 'ORD-12345',
+        orderDate: '2024-12-07T12:00:00Z',
+        totalAmount: 100.0,
+        status: 'CONFIRMED',
+        products: [
+          { productId: 1, name: 'Product 1', price: 40.0, quantity: 2 },
+          { productId: 2, name: 'Product 2', price: 20.0, quantity: 1 },
+        ],
+      };
+
+      service.createOrder(mockOrderRequest).subscribe((response) => {
+        expect(response).toEqual(mockOrderResponse);
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8082/api/orders');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(mockOrderRequest);
+
+      req.flush(mockOrderResponse); // Responde con el mock
+    });
+
+    it('should handle an error response', () => {
+      const mockOrderRequest: OrderRequest = {
+        products: [{ productId: 1, quantity: 2 }],
+      };
+
+      const mockErrorResponse = { status: 400, statusText: 'Bad Request' };
+
+      service.createOrder(mockOrderRequest).subscribe({
+        next: () => fail('Expected an error, but got a response'),
+        error: (error) => {
+          expect(error.status).toBe(400);
+          expect(error.statusText).toBe('Bad Request');
+        },
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8082/api/orders');
+      expect(req.request.method).toBe('POST');
+      req.flush(null, mockErrorResponse);
+    });
   });
 });

@@ -1,1 +1,1 @@
- 2tsX.hrsrc/app/app.routes.ts
+ 2tsXhrsrc/app/app.component.ts

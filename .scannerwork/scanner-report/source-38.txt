@@ -1,22 +1,26 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { selectIsLoggedIn } from '../store/session/session.selectors';
 
-describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent],
-    }).compileComponents();
-  });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthGuard implements CanActivate {
+  constructor(private store: Store, private router: Router) {}
 
-  it(`should have the 'web-shop-front' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('web-shop-front');
-  });
-});
+  canActivate(): Observable<boolean> {
+    return this.store.select(selectIsLoggedIn).pipe(
+      map((isLoggedIn) => {
+        if (!isLoggedIn) {
+          this.router.navigate(['/login']); // Redirige a login si no está autenticado
+          return false;
+        }
+        return true;
+      })
+    );
+  }
+}

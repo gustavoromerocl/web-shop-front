@@ -1,1 +1,1 @@
- 2cssXhr-src/app/pages/register/register.component.css
+ 2webX'hr>src/app/pages/recover-password/recover-password.component.html

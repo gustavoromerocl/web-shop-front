@@ -1,32 +1,35 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
 
-@Component({
-  selector: 'app-recover-password',
-  templateUrl: './recover-password.component.html',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-})
-export class RecoverPasswordComponent {
-  recoverForm: FormGroup;
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.recoverForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-    });
-  }
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
-  navigateToLogin() {
-    this.router.navigate(['/login']);
-  }
+button:disabled {
+  background-color: #ccc;
+}
 
-  onSubmit() {
-    if (this.recoverForm.valid) {
-      const { email } = this.recoverForm.value;
-      alert(`Password recovery instructions have been sent to: ${email}`);
-      this.router.navigate(['/login']); // Redirige al login
-    }
-  }
+.text-decoration-underline {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #007bff;
 }

@@ -1,133 +1,102 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RegisterComponent } from './register.component';
-import { Router } from '@angular/router';
-import { UserService } from '../../services/user/user.service';
-import { of, throwError } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { UserService } from './user.service';
 
-describe('RegisterComponent', () => {
-  let component: RegisterComponent;
-  let fixture: ComponentFixture<RegisterComponent>;
-  let userServiceSpy: jasmine.SpyObj<UserService>;
-  let routerSpy: jasmine.SpyObj<Router>;
+describe('UserService', () => {
+  let service: UserService;
+  let httpMock: HttpTestingController;
 
-  beforeEach(async () => {
-    // Mock del servicio UserService
-    userServiceSpy = jasmine.createSpyObj('UserService', ['registerUser']);
-    // Mock del Router
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+  const apiUrl = 'http://localhost:8081/api';
+  const mockUser = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    password: '123456',
+    role: 'admin',
+  };
 
-    await TestBed.configureTestingModule({
-      imports: [RegisterComponent], // Importa el componente standalone aquí
-      providers: [
-        { provide: UserService, useValue: userServiceSpy },
-        { provide: Router, useValue: routerSpy },
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(RegisterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [UserService],
+    });
+    service = TestBed.inject(UserService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify();
   });
 
-  describe('Form Initialization', () => {
-    it('should initialize the form with empty fields and validators', () => {
-      const form = component.registerForm;
-      expect(form).toBeDefined();
-      expect(form.get('name')?.valid).toBeFalse();
-      expect(form.get('email')?.valid).toBeFalse();
-      expect(form.get('password')?.valid).toBeFalse();
-      expect(form.get('confirmPassword')?.valid).toBeFalse();
-    });
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  describe('Custom Validators', () => {
-    it('should validate uppercase letters in the password', () => {
-      const control = component.registerForm.get('password');
-      control?.setValue('lowercase1@');
-      expect(control?.hasError('uppercase')).toBeTrue();
-      control?.setValue('Uppercase1@');
-      expect(control?.hasError('uppercase')).toBeFalse();
+  it('should register a new user', () => {
+    const newUser = { email: 'newuser@example.com', password: 'password123' };
+
+    service.registerUser(newUser).subscribe((response) => {
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(mockUser);
     });
 
-    it('should validate numbers in the password', () => {
-      const control = component.registerForm.get('password');
-      control?.setValue('NoNumbers@');
-      expect(control?.hasError('number')).toBeTrue();
-      control?.setValue('HasNumber1@');
-      expect(control?.hasError('number')).toBeFalse();
-    });
+    const req = httpMock.expectOne(`${apiUrl}/auth/signup`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(newUser);
 
-    it('should validate special characters in the password', () => {
-      const control = component.registerForm.get('password');
-      control?.setValue('NoSpecial1');
-      expect(control?.hasError('specialCharacter')).toBeTrue();
-      control?.setValue('HasSpecial1@');
-      expect(control?.hasError('specialCharacter')).toBeFalse();
-    });
+    req.flush(mockUser, { status: 201, statusText: 'Created' });
   });
 
-  describe('Password Match Validator', () => {
-    it('should validate that passwords match', () => {
-      const form = component.registerForm;
-      form.get('password')?.setValue('Password1@');
-      form.get('confirmPassword')?.setValue('Mismatch1@');
-      expect(form.hasError('mismatch')).toBeTrue();
+  it('should login a user and return a token', () => {
+    const loginData = { email: 'john@example.com', password: '123456' };
+    const mockToken = { token: 'mockToken' };
 
-      form.get('confirmPassword')?.setValue('Password1@');
-      expect(form.hasError('mismatch')).toBeFalse();
+    service.login(loginData.email, loginData.password).subscribe((response) => {
+      expect(response).toEqual(mockToken);
     });
+
+    const req = httpMock.expectOne(`${apiUrl}/auth/login`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(loginData);
+
+    req.flush(mockToken);
   });
 
-  describe('Form Submission', () => {
-    it('should call registerUser and navigate to login on successful registration', () => {
-      const mockResponse = { success: true };
-      userServiceSpy.registerUser.and.returnValue(of(mockResponse));
+  it('should fetch user profile with token', () => {
+    const mockToken = 'mockToken';
+    const mockProfile = { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin' };
 
-      component.registerForm.setValue({
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'Password1@',
-        confirmPassword: 'Password1@',
-      });
+    localStorage.setItem('token', mockToken);
 
-      component.onSubmit();
-
-      expect(userServiceSpy.registerUser).toHaveBeenCalledWith({
-        username: 'Test User',
-        email: 'test@example.com',
-        password: 'Password1@',
-      });
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    service.getProfile().subscribe((profile) => {
+      expect(profile).toEqual(mockProfile);
     });
 
-    it('should handle registration errors', () => {
-      userServiceSpy.registerUser.and.returnValue(throwError(() => new Error('Registration failed')));
+    const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
 
-      component.registerForm.setValue({
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'Password1@',
-        confirmPassword: 'Password1@',
-      });
-
-      spyOn(window, 'alert'); // Espía para la alerta
-
-      component.onSubmit();
-
-      expect(userServiceSpy.registerUser).toHaveBeenCalled();
-      expect(window.alert).toHaveBeenCalledWith('Registration failed. Please try again.');
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
-    });
+    req.flush(mockProfile);
   });
 
-  describe('Navigation', () => {
-    it('should navigate to the login page', () => {
-      component.navigateToLogin();
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
-    });
+  it('should find a user in memory without password', () => {
+    service['users'] = [mockUser];
+
+    const user = service.findUser('john@example.com', '123456');
+    expect(user).toEqual({ id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin' });
+  });
+
+  it('should return null if user is not found', () => {
+    service['users'] = [];
+
+    const user = service.findUser('nonexistent@example.com', 'wrongpassword');
+    expect(user).toBeNull();
+  });
+
+  it('should return all users in memory', () => {
+    service['users'] = [mockUser];
+
+    const users = service.getAllUsers();
+    expect(users).toEqual([mockUser]);
   });
 });

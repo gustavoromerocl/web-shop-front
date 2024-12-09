@@ -1,73 +1,149 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
-import { ProfileComponent } from './profile.component';
-import { updateUser } from '../../store/session/session.reducer';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ProductService, PaginatedResponse } from './product.service';
+import { Product } from '../../store/products/product.reducer';
 
-describe('ProfileComponent', () => {
-  let component: ProfileComponent;
-  let fixture: ComponentFixture<ProfileComponent>;
-  let storeMock: jasmine.SpyObj<Store>;
+describe('ProductService', () => {
+  let service: ProductService;
+  let httpTestingController: HttpTestingController;
 
-  beforeEach(async () => {
-    storeMock = jasmine.createSpyObj('Store', ['dispatch', 'select']);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProductService],
+    });
 
-    // Simula el usuario obtenido del store
-    storeMock.select.and.returnValue(
-      of({ id: '123', name: 'Test User', email: 'test@example.com' })
-    );
-
-    await TestBed.configureTestingModule({
-      imports: [ProfileComponent, ReactiveFormsModule],
-      providers: [{ provide: Store, useValue: storeMock }],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(ProfileComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    service = TestBed.inject(ProductService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    httpTestingController.verify(); // Verifica que no queden solicitudes pendientes
   });
 
-  it('should initialize the form with user data from the store', () => {
-    expect(component.profileForm.value).toEqual({
-      name: 'Test User',
-      email: 'test@example.com',
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('getAllProducts', () => {
+    it('should retrieve all products and map the response content', () => {
+      const mockResponse: PaginatedResponse<Product> = {
+        content: [
+          {
+            id: '1',
+            name: 'Product 1',
+            price: 100,
+            stock: 50,
+            imageUrl: 'http://example.com/product1.jpg',
+            category: 'Category 1',
+          },
+          {
+            id: '2',
+            name: 'Product 2',
+            price: 200,
+            stock: 30,
+            imageUrl: 'http://example.com/product2.jpg',
+            category: 'Category 2',
+          },
+        ],
+        pageable: {
+          pageNumber: 0,
+          pageSize: 10,
+          offset: 0,
+          paged: true,
+          unpaged: false,
+        },
+        totalElements: 2,
+        totalPages: 1,
+        last: true,
+        size: 10,
+        number: 0,
+        sort: { sorted: true, unsorted: false, empty: false },
+        numberOfElements: 2,
+        first: true,
+        empty: false,
+      };
+
+      service.getAllProducts().subscribe((products) => {
+        expect(products).toBeDefined();
+        expect(products.length).toBe(2);
+        expect(products).toEqual(mockResponse.content);
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('GET');
+
+      req.flush(mockResponse); // Simula la respuesta del backend
+    });
+
+    it('should handle empty content in response', () => {
+      const mockResponse: PaginatedResponse<Product> = {
+        content: [],
+        pageable: {
+          pageNumber: 0,
+          pageSize: 10,
+          offset: 0,
+          paged: true,
+          unpaged: false,
+        },
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        size: 10,
+        number: 0,
+        sort: { sorted: true, unsorted: false, empty: false },
+        numberOfElements: 0,
+        first: true,
+        empty: true,
+      };
+
+      service.getAllProducts().subscribe((products) => {
+        expect(products).toBeDefined();
+        expect(products.length).toBe(0);
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('GET');
+
+      req.flush(mockResponse);
     });
   });
 
-  it('should dispatch updateUser and show success alert on form submit', () => {
-    spyOn(window, 'alert');
+  describe('addProduct', () => {
+    it('should send a POST request to add a new product', () => {
+      const newProduct: Product = {
+        id: '3',
+        name: 'Product 3',
+        price: 300,
+        stock: 100,
+        imageUrl: 'http://example.com/product3.jpg',
+        category: 'Category 3',
+      };
 
-    // Actualiza el valor del formulario
-    component.profileForm.setValue({
-      name: 'Updated User',
-      email: 'updated@example.com',
+      service.addProduct(newProduct).subscribe((product) => {
+        expect(product).toEqual(newProduct);
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(newProduct);
+
+      req.flush(newProduct); // Simula la respuesta del backend
     });
-
-    component.onSubmit();
-
-    expect(storeMock.dispatch).toHaveBeenCalledWith(
-      updateUser({
-        user: { name: 'Updated User', email: 'updated@example.com' },
-      })
-    );
-
-    expect(window.alert).toHaveBeenCalledWith('Profile updated successfully!');
   });
 
-  it('should not dispatch updateUser if the form is invalid', () => {
-    // Establece un valor inválido en el formulario
-    component.profileForm.setValue({
-      name: '',
-      email: 'invalid-email',
+  describe('removeProduct', () => {
+    it('should send a DELETE request to remove a product by ID', () => {
+      const productId = '1';
+
+      service.removeProduct(productId).subscribe(() => {
+        expect(true).toBeTrue(); // Verifica que la operación fue exitosa
+      });
+
+      const req = httpTestingController.expectOne(`http://localhost:8080/api/products/${productId}`);
+      expect(req.request.method).toBe('DELETE');
+
+      req.flush(null); // Simula una respuesta vacía exitosa
     });
-
-    component.onSubmit();
-
-    expect(storeMock.dispatch).not.toHaveBeenCalled();
   });
 });

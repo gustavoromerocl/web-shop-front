@@ -1,1 +1,1 @@
- 2tsXThr&src/app/pages/login/login.component.ts
+ 2tsX4hrsrc/app/app.routes.ts

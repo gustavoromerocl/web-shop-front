@@ -1,1 +1,1 @@
- 2webX1hr,src/app/pages/profile/profile.component.html
+ 2tsXihr,src/app/pages/register/register.component.ts

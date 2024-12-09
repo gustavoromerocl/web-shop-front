@@ -1,1 +1,1 @@
- 2webX-hr5src/app/layout/base-layout/base-layout.component.html
+ 2webXhr&src/app/pages/home/home.component.html

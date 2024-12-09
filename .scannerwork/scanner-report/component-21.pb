@@ -1,1 +1,1 @@
- 2tsXihr,src/app/pages/register/register.component.ts
+ 2webXmhr.src/app/pages/register/register.component.html

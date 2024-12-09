@@ -1,1 +1,1 @@
- 2cssXhr+src/app/pages/profile/profile.component.css
+ 2cssXhr-src/app/pages/register/register.component.css

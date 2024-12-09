@@ -1,2 +1,2 @@
 
- 2tsXhrsrc/app/app.component.ts
+ 2tsXMhr)src/app/store/products/product.reducer.ts

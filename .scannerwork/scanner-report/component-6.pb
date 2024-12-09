@@ -1,1 +1,1 @@
- 2tsXhr*src/app/store/session/session.selectors.ts
+ 2tsX2hr%src/app/services/cart/cart.service.ts

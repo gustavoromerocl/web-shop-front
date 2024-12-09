@@ -1,104 +1,108 @@
-import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-  ValidatorFn,
-  AbstractControl,
-  ValidationErrors,
-} from '@angular/forms';
-import { Router } from '@angular/router';
-import { UserService } from '../../services/user/user.service'; // Importa el servicio
-import { CommonModule } from '@angular/common';
+<div class="register-container">
+  <h2>Register</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input
+        id="name"
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <div
+        *ngIf="
+          registerForm.get('name')?.invalid && registerForm.get('name')?.touched
+        "
+        class="text-danger"
+      >
+        Name is required (min 3 characters).
+      </div>
+    </div>
 
-@Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-})
-export class RegisterComponent {
-  registerForm: FormGroup;
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+        id="email"
+        type="email"
+        class="form-control"
+        formControlName="email"
+      />
+      <div
+        *ngIf="
+          registerForm.get('email')?.invalid &&
+          registerForm.get('email')?.touched
+        "
+        class="text-danger"
+      >
+        Valid email is required.
+      </div>
+    </div>
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserService, // Inyecta el servicio
-    private router: Router
-  ) {
-    this.registerForm = this.fb.group(
-      {
-        name: ['', [Validators.required, Validators.minLength(3)]],
-        email: ['', [Validators.required, Validators.email]],
-        password: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(6),
-            this.uppercaseValidator(),
-            this.numberValidator(),
-            this.specialCharacterValidator(),
-          ],
-        ],
-        confirmPassword: ['', [Validators.required]],
-      },
-      {
-        validators: this.passwordMatchValidator,
-      }
-    );
-  }
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input
+        id="password"
+        type="password"
+        class="form-control"
+        formControlName="password"
+      />
+      <div
+        *ngIf="
+          registerForm.get('password')?.errors &&
+          registerForm.get('password')?.touched
+        "
+        class="text-danger"
+      >
+        <div *ngIf="registerForm.get('password')?.errors?.['required']">
+          Password is required.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['minlength']">
+          Password must be at least 6 characters.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['uppercase']">
+          Password must contain at least one uppercase letter.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['number']">
+          Password must contain at least one number.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['specialCharacter']">
+          Password must contain at least one special character.
+        </div>
+      </div>
+    </div>
 
-  navigateToLogin() {
-    this.router.navigate(['/login']);
-  }
+    <div class="mb-3">
+      <label for="confirmPassword" class="form-label">Confirm Password</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        class="form-control"
+        formControlName="confirmPassword"
+      />
+      <div
+        *ngIf="
+          registerForm.errors?.['mismatch'] &&
+          registerForm.get('confirmPassword')?.touched
+        "
+        class="text-danger"
+      >
+        Passwords do not match.
+      </div>
+    </div>
 
-  passwordMatchValidator(group: FormGroup): ValidationErrors | null {
-    const password = group.get('password')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
-  }
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="registerForm.invalid"
+    >
+      Register
+    </button>
+  </form>
 
-  // Custom Validator for Uppercase Letter
-  uppercaseValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const hasUppercase = /[A-Z]/.test(control.value);
-      return hasUppercase ? null : { uppercase: true };
-    };
-  }
-
-  // Custom Validator for Number
-  numberValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const hasNumber = /\d/.test(control.value);
-      return hasNumber ? null : { number: true };
-    };
-  }
-
-  // Custom Validator for Special Character
-  specialCharacterValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const hasSpecialCharacter = /[@#$%^&*(),.?":{}|<>]/.test(control.value);
-      return hasSpecialCharacter ? null : { specialCharacter: true };
-    };
-  }
-
-  onSubmit() {
-    if (this.registerForm.valid) {
-      const { name, email, password } = this.registerForm.value;
-      const newUser = { username: name, email, password };
-  
-      this.userService.registerUser(newUser).subscribe({
-        next: (response) => {
-          console.log('Registration Response:', response); // Verifica la respuesta en consola
-          alert('Registration successful!');
-          this.router.navigate(['/login']);
-        },
-        error: (err) => {
-          console.error('Error Details:', err); // Imprime el error completo
-          alert('Registration failed. Please try again.');
-        },
-      });
-    }
-  }
-  
-}
+  <p class="mt-3">
+    Already have an account?
+    <button class="btn btn-link p-0" (click)="navigateToLogin()">
+      Login here
+    </button>
+  </p>
+</div>

@@ -1,8 +1,31 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Product } from '../../store/products/product.reducer';
 
+export interface PaginatedResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +37,9 @@ export class ProductService {
 
   // Obtener todos los productos
   getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    return this.http.get<PaginatedResponse<Product>>(this.apiUrl).pipe(
+      map((response: PaginatedResponse<Product>) => response.content)
+    );
   }
 
   // Agregar un nuevo producto
