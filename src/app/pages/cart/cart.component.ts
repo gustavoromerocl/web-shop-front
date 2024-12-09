@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService, OrderRequest, OrderResponse } from '../../services/order/order.service';
 import { CommonModule } from '@angular/common';
 import { CartItem, CartService } from '../../services/cart/cart.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
@@ -45,16 +46,16 @@ export class CartComponent implements OnInit {
       })),
     };
 
-    this.orderService.createOrder(orderRequest).subscribe(
-      (response) => {
+    (async () => {
+      try {
+        const response = await firstValueFrom(this.orderService.createOrder(orderRequest));
         this.orderDetail = response;
-        this.clearCart(); // Limpia el carrito tras la compra
+        this.clearCart();
         alert(`¡Orden creada con éxito! Número: ${response.orderNumber}`);
-      },
-      (error) => {
+      } catch (error) {
         console.error('Error al realizar la orden:', error);
         alert('Hubo un problema al procesar la orden.');
       }
-    );
+    })();
   }
 }

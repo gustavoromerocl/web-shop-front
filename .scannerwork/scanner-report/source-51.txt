@@ -1,48 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HomeComponent } from './home.component';
+import { BaseLayoutComponent } from './base-layout.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { selectAllProducts } from '../../store/products/product.selectors';
-import { loadProducts, Product } from '../../store/products/product.reducer';
-import { of } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('BaseLayoutComponent', () => {
+  let component: BaseLayoutComponent;
+  let fixture: ComponentFixture<BaseLayoutComponent>;
   let store: MockStore;
+  let router: Router;
 
-  const mockProducts: Product[] = [
-    {
-      id: '1',
-      name: 'Product 1',
-      price: 100,
-      stock: 10,
-      imageUrl: 'https://example.com/image1.jpg',
-      category: 'Electronics',
-    },
-    {
-      id: '2',
-      name: 'Product 2',
-      price: 200,
-      stock: 5,
-      imageUrl: 'https://example.com/image2.jpg',
-      category: 'Home',
-    },
-  ];
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeComponent],
+      imports: [
+        BaseLayoutComponent,
+        RouterTestingModule.withRoutes([]), // Rutas simuladas
+      ],
       providers: [
-        provideMockStore({
-          selectors: [
-            { selector: selectAllProducts, value: mockProducts },
-          ],
-        }),
+        provideMockStore(), // Mock del Store para NgRx
       ],
     }).compileComponents();
 
-    store = TestBed.inject(MockStore);
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(BaseLayoutComponent);
     component = fixture.componentInstance;
+    store = TestBed.inject(MockStore);
+    router = TestBed.inject(Router);
 
     fixture.detectChanges();
   });
@@ -51,16 +33,13 @@ describe('HomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should select all products from the store', (done) => {
-    component.products$.subscribe((products) => {
-      expect(products).toEqual(mockProducts);
-      done();
-    });
-  });
+  it('should dispatch logout and navigate to login', async () => {
+    const dispatchSpy = spyOn(store, 'dispatch'); // Espía para verificar el dispatch
+    const navigateSpy = spyOn(router, 'navigate'); // Espía para verificar la navegación
 
-  it('should dispatch loadProducts on initialization', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(loadProducts());
+    component.logout();
+
+    expect(dispatchSpy).toHaveBeenCalledTimes(1);
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
   });
 });

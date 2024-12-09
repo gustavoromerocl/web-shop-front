@@ -1,1 +1,1 @@
-  2cssXhr%src/app/pages/home/home.component.css
+  2webXhrsrc/app/app.component.html

@@ -1,1 +1,1 @@
-, (2tsXuhr*src/app/services/cart/cart.service.spec.ts
+, (2tsXhrsrc/app/app.component.spec.ts

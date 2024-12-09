@@ -1,1 +1,1 @@
-/ (2tsXhrAsrc/app/pages/recover-password/recover-password.component.spec.ts
+/ (2tsX†hr1src/app/pages/register/register.component.spec.ts

@@ -1,1 +1,1 @@
- 2tsX&hr$src/app/pages/home/home.component.ts
+ 2cssXhr%src/app/pages/home/home.component.css

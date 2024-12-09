@@ -1,20 +1,27 @@
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  background-color: #007bff;
-  padding: 1rem;
-  color: white;
-}
+import { Component } from '@angular/core';
+import { Store } from '@ngrx/store';
 
-a {
-  color: white;
-  text-decoration: none;
-  margin-right: 1rem;
-}
+import { Observable } from 'rxjs';
+import { RouterModule, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { selectUser } from '../../store/session/session.selectors';
+import { logout } from '../../store/session/session.reducer';
 
-button {
-  background-color: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
+@Component({
+  selector: 'app-base-layout',
+  templateUrl: './base-layout.component.html',
+  standalone: true,
+  imports: [RouterModule, CommonModule],
+})
+export class BaseLayoutComponent {
+  user$: Observable<{ id: string; name?: string; role: string; email: string } | null>;
+
+  constructor(private store: Store, private router: Router) {
+    this.user$ = this.store.select(selectUser);
+  }
+
+  logout() {
+    this.store.dispatch(logout());
+    this.router.navigate(['/login']); // Redirige al login después del logout
+  }
 }

@@ -1,19 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProductService, PaginatedResponse } from './product.service';
-import { Product } from '../../store/products/product.reducer';
+import { OrderService, OrderRequest, OrderResponse } from './order.service';
 
-describe('ProductService', () => {
-  let service: ProductService;
+describe('OrderService', () => {
+  let service: OrderService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProductService],
+      providers: [OrderService],
     });
 
-    service = TestBed.inject(ProductService);
+    service = TestBed.inject(OrderService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -25,125 +24,56 @@ describe('ProductService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getAllProducts', () => {
-    it('should retrieve all products and map the response content', () => {
-      const mockResponse: PaginatedResponse<Product> = {
-        content: [
-          {
-            id: '1',
-            name: 'Product 1',
-            price: 100,
-            stock: 50,
-            imageUrl: 'http://example.com/product1.jpg',
-            category: 'Category 1',
-          },
-          {
-            id: '2',
-            name: 'Product 2',
-            price: 200,
-            stock: 30,
-            imageUrl: 'http://example.com/product2.jpg',
-            category: 'Category 2',
-          },
+  describe('createOrder', () => {
+    it('should send a POST request to create an order and return the response', () => {
+      const mockOrderRequest: OrderRequest = {
+        products: [
+          { productId: 1, quantity: 2 },
+          { productId: 2, quantity: 1 },
         ],
-        pageable: {
-          pageNumber: 0,
-          pageSize: 10,
-          offset: 0,
-          paged: true,
-          unpaged: false,
-        },
-        totalElements: 2,
-        totalPages: 1,
-        last: true,
-        size: 10,
-        number: 0,
-        sort: { sorted: true, unsorted: false, empty: false },
-        numberOfElements: 2,
-        first: true,
-        empty: false,
       };
 
-      service.getAllProducts().subscribe((products) => {
-        expect(products).toBeDefined();
-        expect(products.length).toBe(2);
-        expect(products).toEqual(mockResponse.content);
-      });
-
-      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
-      expect(req.request.method).toBe('GET');
-
-      req.flush(mockResponse); // Simula la respuesta del backend
-    });
-
-    it('should handle empty content in response', () => {
-      const mockResponse: PaginatedResponse<Product> = {
-        content: [],
-        pageable: {
-          pageNumber: 0,
-          pageSize: 10,
-          offset: 0,
-          paged: true,
-          unpaged: false,
-        },
-        totalElements: 0,
-        totalPages: 0,
-        last: true,
-        size: 10,
-        number: 0,
-        sort: { sorted: true, unsorted: false, empty: false },
-        numberOfElements: 0,
-        first: true,
-        empty: true,
+      const mockOrderResponse: OrderResponse = {
+        id: 1,
+        orderNumber: 'ORD-12345',
+        orderDate: '2024-12-07T12:00:00Z',
+        totalAmount: 100.0,
+        status: 'CONFIRMED',
+        products: [
+          { productId: 1, name: 'Product 1', price: 40.0, quantity: 2 },
+          { productId: 2, name: 'Product 2', price: 20.0, quantity: 1 },
+        ],
       };
 
-      service.getAllProducts().subscribe((products) => {
-        expect(products).toBeDefined();
-        expect(products.length).toBe(0);
+      service.createOrder(mockOrderRequest).subscribe((response) => {
+        expect(response).toEqual(mockOrderResponse);
       });
 
-      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
-      expect(req.request.method).toBe('GET');
-
-      req.flush(mockResponse);
-    });
-  });
-
-  describe('addProduct', () => {
-    it('should send a POST request to add a new product', () => {
-      const newProduct: Product = {
-        id: '3',
-        name: 'Product 3',
-        price: 300,
-        stock: 100,
-        imageUrl: 'http://example.com/product3.jpg',
-        category: 'Category 3',
-      };
-
-      service.addProduct(newProduct).subscribe((product) => {
-        expect(product).toEqual(newProduct);
-      });
-
-      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      const req = httpTestingController.expectOne('http://localhost:8082/api/orders');
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(newProduct);
+      expect(req.request.body).toEqual(mockOrderRequest);
 
-      req.flush(newProduct); // Simula la respuesta del backend
+      req.flush(mockOrderResponse); // Responde con el mock
     });
-  });
 
-  describe('removeProduct', () => {
-    it('should send a DELETE request to remove a product by ID', () => {
-      const productId = '1';
+    it('should handle an error response', () => {
+      const mockOrderRequest: OrderRequest = {
+        products: [{ productId: 1, quantity: 2 }],
+      };
 
-      service.removeProduct(productId).subscribe(() => {
-        expect(true).toBeTrue(); // Verifica que la operación fue exitosa
+      const mockErrorResponse = { status: 400, statusText: 'Bad Request' };
+
+      service.createOrder(mockOrderRequest).subscribe({
+        next: () => fail('Expected an error, but got a response'),
+        error: (error) => {
+          expect(error.status).toBe(400);
+          expect(error.statusText).toBe('Bad Request');
+        },
       });
 
-      const req = httpTestingController.expectOne(`http://localhost:8080/api/products/${productId}`);
-      expect(req.request.method).toBe('DELETE');
-
-      req.flush(null); // Simula una respuesta vacía exitosa
+      const req = httpTestingController.expectOne('http://localhost:8082/api/orders');
+      expect(req.request.method).toBe('POST');
+      req.flush(null, mockErrorResponse);
     });
   });
 });

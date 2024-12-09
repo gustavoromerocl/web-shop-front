@@ -1,1 +1,1 @@
-! 2webXhrsrc/app/app.component.html
+! 2tsXhrsrc/app/app.config.ts

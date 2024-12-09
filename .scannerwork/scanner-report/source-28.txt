@@ -1,65 +1,60 @@
-<div class="container mt-4">
-  <!-- Mostrar "Carro de Compras" solo si no hay un detalle de la orden -->
-  <h2 *ngIf="!orderDetail">Carro de Compras</h2>
+import { Component, OnInit } from '@angular/core';
+import { OrderService, OrderRequest, OrderResponse } from '../../services/order/order.service';
+import { CommonModule } from '@angular/common';
+import { CartItem, CartService } from '../../services/cart/cart.service';
 
-  <!-- Mostrar el detalle de la orden si está disponible -->
-  <div *ngIf="orderDetail; else cartContent">
-    <h3>Detalle de la Orden</h3>
-    <p><strong>Número de Orden:</strong> {{ orderDetail.orderNumber }}</p>
-    <p><strong>Fecha:</strong> {{ orderDetail.orderDate }}</p>
-    <p><strong>Total:</strong> {{ orderDetail.totalAmount | currency }}</p>
-    <p><strong>Estado:</strong> {{ orderDetail.status }}</p>
-    <h4>Productos:</h4>
-    <ul>
-      <li *ngFor="let product of orderDetail.products">
-        {{ product.name }} - {{ product.quantity }} x
-        {{ product.price | currency }}
-      </li>
-    </ul>
-  </div>
+@Component({
+  selector: 'app-cart',
+  templateUrl: './cart.component.html',
+  standalone: true,
+  imports: [CommonModule],
+})
+export class CartComponent implements OnInit {
+  cartItems: CartItem[] = [];
+  orderDetail: OrderResponse | null = null;
 
-  <!-- Contenido del carrito -->
-  <ng-template #cartContent>
-    <div *ngIf="cartItems.length; else emptyCart">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Total</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of cartItems">
-            <td>{{ item.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.price | currency }}</td>
-            <td>{{ item.price * item.quantity | currency }}</td>
-            <td>
-              <button
-                class="btn btn-danger btn-sm"
-                (click)="removeItem(item.id)"
-              >
-                Eliminar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="text-end">
-        <h4>Total: {{ getTotal() | currency }}</h4>
-        <button class="btn btn-warning" (click)="clearCart()">
-          Vaciar Carrito
-        </button>
-        <button class="btn btn-success ms-3" (click)="placeOrder()">
-          Comprar
-        </button>
-      </div>
-    </div>
-    <ng-template #emptyCart>
-      <p class="text-center">Tu carro está vacío.</p>
-    </ng-template>
-  </ng-template>
-</div>
+  constructor(private readonly cartService: CartService, private readonly orderService: OrderService) {}
+
+  ngOnInit(): void {
+    this.loadCart();
+  }
+
+  loadCart(): void {
+    this.cartItems = this.cartService.getCartItems();
+  }
+
+  getTotal(): number {
+    return this.cartService.getTotalPrice();
+  }
+
+  removeItem(itemId: number): void {
+    this.cartService.removeFromCart(itemId);
+    this.loadCart();
+  }
+
+  clearCart(): void {
+    this.cartService.clearCart();
+    this.loadCart();
+  }
+
+  placeOrder(): void {
+    const orderRequest: OrderRequest = {
+      products: this.cartItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+    };
+
+    this.orderService.createOrder(orderRequest).subscribe(
+      (response) => {
+        this.orderDetail = response;
+        this.clearCart(); // Limpia el carrito tras la compra
+        alert(`¡Orden creada con éxito! Número: ${response.orderNumber}`);
+      },
+      (error) => {
+        console.error('Error al realizar la orden:', error);
+        alert('Hubo un problema al procesar la orden.');
+      }
+    );
+  }
+}

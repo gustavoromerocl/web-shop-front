@@ -1,1 +1,1 @@
-% 2tsXhr3src/app/layout/base-layout/base-layout.component.ts
+% 2tsXhrsrc/app/guards/auth.guard.ts

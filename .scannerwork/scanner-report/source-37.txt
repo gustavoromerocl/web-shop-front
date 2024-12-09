@@ -1,27 +1,26 @@
-import { Component } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-
 import { Observable } from 'rxjs';
-import { RouterModule, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { selectUser } from '../../store/session/session.selectors';
-import { logout } from '../../store/session/session.reducer';
+import { map } from 'rxjs/operators';
+import { selectIsLoggedIn } from '../store/session/session.selectors';
 
-@Component({
-  selector: 'app-base-layout',
-  templateUrl: './base-layout.component.html',
-  standalone: true,
-  imports: [RouterModule, CommonModule],
+
+@Injectable({
+  providedIn: 'root',
 })
-export class BaseLayoutComponent {
-  user$: Observable<{ id: string; name?: string; role: string; email: string } | null>;
+export class AuthGuard implements CanActivate {
+  constructor(private store: Store, private router: Router) {}
 
-  constructor(private store: Store, private router: Router) {
-    this.user$ = this.store.select(selectUser);
-  }
-
-  logout() {
-    this.store.dispatch(logout());
-    this.router.navigate(['/login']); // Redirige al login después del logout
+  canActivate(): Observable<boolean> {
+    return this.store.select(selectIsLoggedIn).pipe(
+      map((isLoggedIn) => {
+        if (!isLoggedIn) {
+          this.router.navigate(['/login']); // Redirige a login si no está autenticado
+          return false;
+        }
+        return true;
+      })
+    );
   }
 }

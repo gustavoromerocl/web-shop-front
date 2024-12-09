@@ -1,110 +1,66 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { CartComponent } from './cart.component';
-import { CartService, CartItem } from '../../services/cart/cart.service';
-import { OrderService, OrderRequest, OrderResponse } from '../../services/order/order.service';
-import { of, throwError } from 'rxjs';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HomeComponent } from './home.component';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { selectAllProducts } from '../../store/products/product.selectors';
+import { loadProducts, Product } from '../../store/products/product.reducer';
+import { of } from 'rxjs';
 
-describe('CartComponent', () => {
-  let component: CartComponent;
-  let fixture: ComponentFixture<CartComponent>;
-  let cartServiceSpy: jasmine.SpyObj<CartService>;
-  let orderServiceSpy: jasmine.SpyObj<OrderService>;
+describe('HomeComponent', () => {
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
+  let store: MockStore;
 
+  const mockProducts: Product[] = [
+    {
+      id: '1',
+      name: 'Product 1',
+      price: 100,
+      stock: 10,
+      imageUrl: 'https://example.com/image1.jpg',
+      category: 'Electronics',
+    },
+    {
+      id: '2',
+      name: 'Product 2',
+      price: 200,
+      stock: 5,
+      imageUrl: 'https://example.com/image2.jpg',
+      category: 'Home',
+    },
+  ];
   beforeEach(async () => {
-    cartServiceSpy = jasmine.createSpyObj('CartService', [
-      'getCartItems',
-      'getTotalPrice',
-      'removeFromCart',
-      'clearCart',
-    ]);
-
-    orderServiceSpy = jasmine.createSpyObj('OrderService', ['createOrder']);
-
     await TestBed.configureTestingModule({
-      imports: [CartComponent],
+      imports: [HomeComponent],
       providers: [
-        { provide: CartService, useValue: cartServiceSpy },
-        { provide: OrderService, useValue: orderServiceSpy },
+        provideMockStore({
+          selectors: [
+            { selector: selectAllProducts, value: mockProducts },
+          ],
+        }),
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CartComponent);
+    store = TestBed.inject(MockStore);
+    fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+
+    fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('placeOrder', () => {
-    it('should place an order successfully and clear the cart', () => {
-      const mockCartItems: CartItem[] = [
-        { id: 1, name: 'Item 1', price: 100, quantity: 2 },
-        { id: 2, name: 'Item 2', price: 50, quantity: 1 },
-      ];
-      const mockOrderResponse: OrderResponse = {
-        id: 1,
-        orderNumber: 'ORD-12345',
-        orderDate: '2024-12-07',
-        totalAmount: 250,
-        status: 'CONFIRMED',
-        products: mockCartItems.map((item) => ({
-          productId: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-      };
-
-      // Configura el mock de getCartItems
-      cartServiceSpy.getCartItems.and.returnValue(mockCartItems);
-      orderServiceSpy.createOrder.and.returnValue(of(mockOrderResponse));
-
-      // Llama a loadCart explícitamente
-      component.loadCart();
-
-      spyOn(window, 'alert'); // Espía sobre alert
-      spyOn(component, 'clearCart'); // Espía sobre clearCart
-
-      component.placeOrder();
-
-      expect(cartServiceSpy.getCartItems).toHaveBeenCalled(); // Verifica que getCartItems fue llamado
-      expect(orderServiceSpy.createOrder).toHaveBeenCalledWith({
-        products: mockCartItems.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-      });
-      expect(component.orderDetail).toEqual(mockOrderResponse);
-      expect(component.clearCart).toHaveBeenCalled();
-      expect(window.alert).toHaveBeenCalledWith('¡Orden creada con éxito! Número: ORD-12345');
-    });
-
-    it('should handle errors when placing an order', () => {
-      const mockCartItems: CartItem[] = [
-        { id: 1, name: 'Item 1', price: 100, quantity: 2 },
-      ];
-
-      cartServiceSpy.getCartItems.and.returnValue(mockCartItems);
-      orderServiceSpy.createOrder.and.returnValue(throwError(() => new Error('Order failed')));
-
-      // Llama a loadCart explícitamente
-      component.loadCart();
-
-      spyOn(window, 'alert'); // Espía sobre alert
-
-      component.placeOrder();
-
-      expect(cartServiceSpy.getCartItems).toHaveBeenCalled(); // Verifica que getCartItems fue llamado
-      expect(orderServiceSpy.createOrder).toHaveBeenCalledWith({
-        products: mockCartItems.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-      });
-      expect(component.orderDetail).toBeNull();
-      expect(window.alert).toHaveBeenCalledWith('Hubo un problema al procesar la orden.');
+  it('should select all products from the store', (done) => {
+    component.products$.subscribe((products) => {
+      expect(products).toEqual(mockProducts);
+      done();
     });
   });
-});
 
+  it('should dispatch loadProducts on initialization', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+    component.ngOnInit();
+    expect(dispatchSpy).toHaveBeenCalledWith(loadProducts());
+  });
+});

@@ -1,1 +1,1 @@
-" 2tsXhrsrc/app/app.config.ts
+" 2webX6hr5src/app/layout/base-layout/base-layout.component.html

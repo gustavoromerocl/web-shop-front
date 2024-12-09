@@ -24,9 +24,9 @@ export interface OrderResponse {
   providedIn: 'root',
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8082/api/orders';
+  private readonly apiUrl = 'http://localhost:8082/api/orders';
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   createOrder(order: OrderRequest): Observable<OrderResponse> {
     return this.http.post<OrderResponse>(this.apiUrl, order);

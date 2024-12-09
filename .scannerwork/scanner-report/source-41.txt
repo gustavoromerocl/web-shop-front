@@ -1,102 +1,149 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { UserService } from './user.service';
+import { ProductService, PaginatedResponse } from './product.service';
+import { Product } from '../../store/products/product.reducer';
 
-describe('UserService', () => {
-  let service: UserService;
-  let httpMock: HttpTestingController;
-
-  const apiUrl = 'http://localhost:8081/api';
-  const mockUser = {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    password: '123456',
-    role: 'admin',
-  };
+describe('ProductService', () => {
+  let service: ProductService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UserService],
+      providers: [ProductService],
     });
-    service = TestBed.inject(UserService);
-    httpMock = TestBed.inject(HttpTestingController);
+
+    service = TestBed.inject(ProductService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    httpMock.verify();
+    httpTestingController.verify(); // Verifica que no queden solicitudes pendientes
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should register a new user', () => {
-    const newUser = { email: 'newuser@example.com', password: 'password123' };
+  describe('getAllProducts', () => {
+    it('should retrieve all products and map the response content', () => {
+      const mockResponse: PaginatedResponse<Product> = {
+        content: [
+          {
+            id: '1',
+            name: 'Product 1',
+            price: 100,
+            stock: 50,
+            imageUrl: 'http://example.com/product1.jpg',
+            category: 'Category 1',
+          },
+          {
+            id: '2',
+            name: 'Product 2',
+            price: 200,
+            stock: 30,
+            imageUrl: 'http://example.com/product2.jpg',
+            category: 'Category 2',
+          },
+        ],
+        pageable: {
+          pageNumber: 0,
+          pageSize: 10,
+          offset: 0,
+          paged: true,
+          unpaged: false,
+        },
+        totalElements: 2,
+        totalPages: 1,
+        last: true,
+        size: 10,
+        number: 0,
+        sort: { sorted: true, unsorted: false, empty: false },
+        numberOfElements: 2,
+        first: true,
+        empty: false,
+      };
 
-    service.registerUser(newUser).subscribe((response) => {
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual(mockUser);
+      service.getAllProducts().subscribe((products) => {
+        expect(products).toBeDefined();
+        expect(products.length).toBe(2);
+        expect(products).toEqual(mockResponse.content);
+      });
+
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('GET');
+
+      req.flush(mockResponse); // Simula la respuesta del backend
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/auth/signup`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newUser);
+    it('should handle empty content in response', () => {
+      const mockResponse: PaginatedResponse<Product> = {
+        content: [],
+        pageable: {
+          pageNumber: 0,
+          pageSize: 10,
+          offset: 0,
+          paged: true,
+          unpaged: false,
+        },
+        totalElements: 0,
+        totalPages: 0,
+        last: true,
+        size: 10,
+        number: 0,
+        sort: { sorted: true, unsorted: false, empty: false },
+        numberOfElements: 0,
+        first: true,
+        empty: true,
+      };
 
-    req.flush(mockUser, { status: 201, statusText: 'Created' });
-  });
+      service.getAllProducts().subscribe((products) => {
+        expect(products).toBeDefined();
+        expect(products.length).toBe(0);
+      });
 
-  it('should login a user and return a token', () => {
-    const loginData = { email: 'john@example.com', password: '123456' };
-    const mockToken = { token: 'mockToken' };
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('GET');
 
-    service.login(loginData.email, loginData.password).subscribe((response) => {
-      expect(response).toEqual(mockToken);
+      req.flush(mockResponse);
     });
-
-    const req = httpMock.expectOne(`${apiUrl}/auth/login`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(loginData);
-
-    req.flush(mockToken);
   });
 
-  it('should fetch user profile with token', () => {
-    const mockToken = 'mockToken';
-    const mockProfile = { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin' };
+  describe('addProduct', () => {
+    it('should send a POST request to add a new product', () => {
+      const newProduct: Product = {
+        id: '3',
+        name: 'Product 3',
+        price: 300,
+        stock: 100,
+        imageUrl: 'http://example.com/product3.jpg',
+        category: 'Category 3',
+      };
 
-    localStorage.setItem('token', mockToken);
+      service.addProduct(newProduct).subscribe((product) => {
+        expect(product).toEqual(newProduct);
+      });
 
-    service.getProfile().subscribe((profile) => {
-      expect(profile).toEqual(mockProfile);
+      const req = httpTestingController.expectOne('http://localhost:8080/api/products');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(newProduct);
+
+      req.flush(newProduct); // Simula la respuesta del backend
     });
-
-    const req = httpMock.expectOne(`${apiUrl}/users/profile`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-
-    req.flush(mockProfile);
   });
 
-  it('should find a user in memory without password', () => {
-    service['users'] = [mockUser];
+  describe('removeProduct', () => {
+    it('should send a DELETE request to remove a product by ID', () => {
+      const productId = '1';
 
-    const user = service.findUser('john@example.com', '123456');
-    expect(user).toEqual({ id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin' });
-  });
+      service.removeProduct(productId).subscribe(() => {
+        expect(true).toBeTrue(); // Verifica que la operación fue exitosa
+      });
 
-  it('should return null if user is not found', () => {
-    service['users'] = [];
+      const req = httpTestingController.expectOne(`http://localhost:8080/api/products/${productId}`);
+      expect(req.request.method).toBe('DELETE');
 
-    const user = service.findUser('nonexistent@example.com', 'wrongpassword');
-    expect(user).toBeNull();
-  });
-
-  it('should return all users in memory', () => {
-    service['users'] = [mockUser];
-
-    const users = service.getAllUsers();
-    expect(users).toEqual([mockUser]);
+      req.flush(null); // Simula una respuesta vacía exitosa
+    });
   });
 });

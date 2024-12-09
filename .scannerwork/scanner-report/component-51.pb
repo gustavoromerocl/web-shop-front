@@ -1,1 +1,1 @@
-3 (2tsXChr)src/app/pages/home/home.component.spec.ts
+3 (2tsX.hr8src/app/layout/base-layout/base-layout.component.spec.ts

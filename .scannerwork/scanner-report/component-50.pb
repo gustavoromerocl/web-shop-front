@@ -1,1 +1,1 @@
-2 (2tsXohr)src/app/pages/cart/cart.component.spec.ts
+2 (2tsXChr)src/app/pages/home/home.component.spec.ts

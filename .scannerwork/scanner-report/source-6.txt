@@ -11,7 +11,7 @@ export interface CartItem {
   providedIn: 'root',
 })
 export class CartService {
-  private storageKey = 'shoppingCart';
+  private readonly storageKey = 'shoppingCart';
 
   getCartItems(): CartItem[] {
     const data = localStorage.getItem(this.storageKey);

@@ -1,1 +1,1 @@
- 2tsX>hr$src/app/pages/cart/cart.component.ts
+ 2webXhr&src/app/pages/home/home.component.html

@@ -1,1 +1,1 @@
- 2webXBhr&src/app/pages/cart/cart.component.html
+ 2tsX=hr$src/app/pages/cart/cart.component.ts

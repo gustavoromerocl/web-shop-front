@@ -1,1 +1,1 @@
-$ 2cssXhr4src/app/layout/base-layout/base-layout.component.css
+$ 2tsXhr3src/app/layout/base-layout/base-layout.component.ts
