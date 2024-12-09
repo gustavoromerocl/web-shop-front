@@ -39,6 +39,12 @@ export const routes: Routes = [
         loadComponent: () => 
           import('./pages/recover-password/recover-password.component').then(m => m.RecoverPasswordComponent) 
       },
+      {
+        path: 'cart', 
+        loadComponent: () =>
+          import('./pages/cart/cart.component').then((m) => m.CartComponent),
+        canActivate: [AuthGuard], //Ruta protegida por AuthGuard
+      },
     ],
   },
   { path: '**', redirectTo: 'home' }, // Redirige cualquier otra ruta a home

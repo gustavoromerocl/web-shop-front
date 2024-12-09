@@ -25,6 +25,15 @@
         </ng-container>
       </ul>
 
+      <!-- Carro de compras -->
+      <button
+        class="btn btn-outline-light me-3"
+        routerLink="/cart"
+        aria-label="Carro de compras"
+      >
+        <i class="bi bi-cart"></i>
+      </button>
+
       <!-- Lógica dinámica para Iniciar Sesión/Logout -->
       <ng-container *ngIf="user$ | async as user; else login">
         <span class="navbar-text me-3"> Welcome, {{ user.name }}! </span>

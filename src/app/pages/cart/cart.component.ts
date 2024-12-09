@@ -1,0 +1,61 @@
+import { Component, OnInit } from '@angular/core';
+import { OrderService, OrderRequest, OrderResponse } from '../../services/order/order.service';
+import { CommonModule } from '@angular/common';
+import { CartItem, CartService } from '../../services/cart/cart.service';
+
+@Component({
+  selector: 'app-cart',
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css'],
+  standalone: true,
+  imports: [CommonModule],
+})
+export class CartComponent implements OnInit {
+  cartItems: CartItem[] = [];
+  orderDetail: OrderResponse | null = null;
+
+  constructor(private cartService: CartService, private orderService: OrderService) {}
+
+  ngOnInit(): void {
+    this.loadCart();
+  }
+
+  loadCart(): void {
+    this.cartItems = this.cartService.getCartItems();
+  }
+
+  getTotal(): number {
+    return this.cartService.getTotalPrice();
+  }
+
+  removeItem(itemId: number): void {
+    this.cartService.removeFromCart(itemId);
+    this.loadCart();
+  }
+
+  clearCart(): void {
+    this.cartService.clearCart();
+    this.loadCart();
+  }
+
+  placeOrder(): void {
+    const orderRequest: OrderRequest = {
+      products: this.cartItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+    };
+
+    this.orderService.createOrder(orderRequest).subscribe(
+      (response) => {
+        this.orderDetail = response;
+        this.clearCart(); // Limpia el carrito tras la compra
+        alert(`¡Orden creada con éxito! Número: ${response.orderNumber}`);
+      },
+      (error) => {
+        console.error('Error al realizar la orden:', error);
+        alert('Hubo un problema al procesar la orden.');
+      }
+    );
+  }
+}
