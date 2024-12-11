@@ -1,1 +1,1 @@
- 2tsX=hr$src/app/pages/cart/cart.component.ts
+ 2tsX>hr$src/app/pages/cart/cart.component.ts
