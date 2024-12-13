@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-interface User {
+export interface User {
   id: string;
   name?: string;
   email: string;
@@ -50,8 +50,24 @@ export class UserService {
     return null;
   }
 
-  // Obtener todos los usuarios (solo para verificar)
-  getAllUsers(): User[] {
-    return this.users;
+  // users management
+  getUsers(): Observable<User[]> {
+    const url = `${this.apiUrl}/users`;
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.get<User[]>(url, { headers });
+  }
+
+  updateUser(userId: string, payload: { username: string; email: string; password: string }): Observable<any> {
+    const url = `${this.apiUrl}/users/${userId}`;
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.put<User>(url, payload, { headers });
+  }
+
+  deleteUser(userId: string): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, { headers });
   }
 }

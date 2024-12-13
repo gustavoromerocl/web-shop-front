@@ -16,9 +16,15 @@ export class RoleGuard implements CanActivate {
 
     return this.store.select(selectUser).pipe(
       map((user) => {
+        console.log('Usuario actual:', user);
+        console.log('Rol requerido:', requiredRole);
+    
         if (user && user.role === requiredRole) {
+          console.log('Acceso permitido');
           return true;
         }
+    
+        console.log('Acceso denegado');
         this.router.navigate(['/home']);
         return false;
       })

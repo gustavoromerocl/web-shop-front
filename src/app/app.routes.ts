@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AuthGuard } from './guards/auth.guard'; // Asegúrate de importar el guard
 import { BaseLayoutComponent } from './layout/base-layout/base-layout.component';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,16 @@ export const routes: Routes = [
           import('./pages/cart/cart.component').then((m) => m.CartComponent),
         canActivate: [AuthGuard], //Ruta protegida por AuthGuard
       },
+      {
+        path: 'user-management',
+        loadComponent: () =>
+          import('./pages/user-management/user-management.component').then(
+            (m) => m.UserManagementComponent
+          ),
+        canActivate: [RoleGuard], // Protege la ruta
+        data: { role: 'ADMIN' }, // Solo para administradores
+      },
+      
     ],
   },
   { path: '**', redirectTo: 'home' }, // Redirige cualquier otra ruta a home
