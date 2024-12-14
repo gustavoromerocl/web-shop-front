@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { selectUser } from '../../store/session/session.selectors';
 import { updateUser } from '../../store/session/session.reducer';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-profile',
@@ -17,7 +18,7 @@ export class ProfileComponent {
   profileForm: FormGroup;
   user$: Observable<{ id: string; name?: string; email: string } | null>;
 
-  constructor(private fb: FormBuilder, private store: Store) {
+  constructor(private fb: FormBuilder, private store: Store, private readonly toastr: ToastrService) {
     this.user$ = this.store.select(selectUser);
 
     this.profileForm = this.fb.group({
@@ -38,7 +39,7 @@ export class ProfileComponent {
   onSubmit() {
     if (this.profileForm.valid) {
       this.store.dispatch(updateUser({ user: this.profileForm.value }));
-      alert('Profile updated successfully!');
+      this.toastr.success('Profile updated successfully!');
     }
   }
 }

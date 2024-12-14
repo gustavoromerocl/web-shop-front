@@ -5,6 +5,7 @@ import { UserService } from '../../services//user/user.service';
 import { CommonModule } from '@angular/common';
 import { login } from '../../store/session/session.reducer';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginComponent {
     private fb: FormBuilder,
     private store: Store,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private readonly toastr: ToastrService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -53,18 +55,18 @@ export class LoginComponent {
                 email: user.email, 
                 role: user.roles[0].name || 'ROLE_USER' 
               }}));
-              // alert(`Bienvenido, ${profile.name || 'Usuario'}`);
+
               this.router.navigate(['/home']);
             },
             error: (err) => {
               console.error('Error fetching profile:', err);
-              alert('Failed to fetch profile. Please try again.');
+              this.toastr.error('Failed to fetch profile. Please try again.');
             },
           });
         },
         error: (err) => {
           console.error('Error Details:', err);
-          alert('Login failed. Please try again.');
+          this.toastr.error('Login failed. Please try again.');
         },
       });
       // Encuentra al usuario con el servicio

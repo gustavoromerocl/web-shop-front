@@ -17,7 +17,7 @@
         <td>{{ user.email }}</td>
         <td>{{ user.role }}</td>
         <td>
-          <button class="btn btn-primary btn-sm" (click)="editUser(user)">
+          <button class="btn btn-success btn-sm" (click)="editUser(user)">
             Editar
           </button>
           <button class="btn btn-danger btn-sm" (click)="deleteUser(user.id)">
@@ -83,7 +83,7 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancelar
         </button>
-        <button type="button" class="btn btn-primary" (click)="saveUser()">
+        <button type="button" class="btn btn-success" (click)="saveUser()">
           Guardar Cambios
         </button>
       </div>

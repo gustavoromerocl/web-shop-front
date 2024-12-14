@@ -11,6 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user/user.service'; // Importa el servicio
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +25,8 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private userService: UserService, // Inyecta el servicio
-    private router: Router
+    private router: Router,
+    private readonly toastr: ToastrService,
   ) {
     this.registerForm = this.fb.group(
       {
@@ -90,12 +92,12 @@ export class RegisterComponent {
       this.userService.registerUser(newUser).subscribe({
         next: (response) => {
           console.log('Registration Response:', response); // Verifica la respuesta en consola
-          alert('Registration successful!');
+          this.toastr.success('Registration successful!');
           this.router.navigate(['/login']);
         },
         error: (err) => {
           console.error('Error Details:', err); // Imprime el error completo
-          alert('Registration failed. Please try again.');
+          this.toastr.error('Registration failed. Please try again.');
         },
       });
     }

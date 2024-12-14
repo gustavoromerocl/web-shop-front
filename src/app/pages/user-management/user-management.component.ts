@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { User, UserService } from '../../services/user/user.service';
 import * as bootstrap from 'bootstrap';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-management',
@@ -16,7 +17,7 @@ export class UserManagementComponent implements OnInit {
   userForm: FormGroup;
   selectedUser: User | null = null;
 
-  constructor(private userService: UserService, private fb: FormBuilder) {
+  constructor(private userService: UserService, private fb: FormBuilder, private readonly toastr: ToastrService) {
     this.userForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -66,11 +67,13 @@ export class UserManagementComponent implements OnInit {
         this.loadUsers();
       });
     }
+    this.toastr.error('El usuario ha sido eliminado', 'Administrador')
   }
 
   closeModal(): void {
     const modalElement = document.getElementById('editUserModal');
     const modal = bootstrap.Modal.getInstance(modalElement!)!;
     modal.hide();
+    this.toastr.success('Usuario actualizado', 'Administrador')
   }
 }

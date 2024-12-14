@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-recover-password',
@@ -12,7 +13,7 @@ import { CommonModule } from '@angular/common';
 export class RecoverPasswordComponent {
   recoverForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private readonly toastr: ToastrService) {
     this.recoverForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
     });
@@ -25,7 +26,7 @@ export class RecoverPasswordComponent {
   onSubmit() {
     if (this.recoverForm.valid) {
       const { email } = this.recoverForm.value;
-      alert(`Password recovery instructions have been sent to: ${email}`);
+      this.toastr.info(`Password recovery instructions have been sent to: ${email}`);
       this.router.navigate(['/login']); // Redirige al login
     }
   }

@@ -39,7 +39,7 @@
 
     <button
       type="submit"
-      class="btn btn-primary"
+      class="btn btn-success"
       [disabled]="profileForm.invalid"
     >
       Save Changes
