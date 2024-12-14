@@ -13,13 +13,14 @@ export class ProductEffects {
   // Efecto para cargar productos
   loadProducts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadProducts), // Captura la acción "loadProducts"
-      mergeMap(() =>
-        this.productService.getAllProducts().pipe(
-          map((products) => loadProductsSuccess({ products })), // Despacha "loadProductsSuccess"
-          catchError((error) => of(loadProductsFailure({ error }))) // Despacha "loadProductsFailure"
+      ofType(loadProducts),
+      mergeMap(({ keyword }) =>
+        this.productService.getAllProducts(keyword).pipe(
+          map((products) => loadProductsSuccess({ products })),
+          catchError((error) => of(loadProductsFailure({ error })))
         )
       )
     )
   );
+  
 }

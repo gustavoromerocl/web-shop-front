@@ -23,7 +23,11 @@ const initialState: ProductsState = {
 };
 
 // Cargar productos desde la API
-export const loadProducts = createAction('[Products] Load Products');
+export const loadProducts = createAction(
+  '[Products] Load Products',
+  props<{ keyword?: string }>() // Ahora acepta un keyword opcional
+);
+
 
 // Cargar productos exitosamente
 export const loadProductsSuccess = createAction(

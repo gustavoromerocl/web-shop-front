@@ -4,17 +4,19 @@ import { loadProducts, Product } from '../../store/products/product.reducer';
 import { Store } from '@ngrx/store';
 import { selectAllProducts } from '../../store/products/product.selectors';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Importamos FormsModule para ngModel
 import { CartService } from '../../services/cart/cart.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   products$: Observable<Product[]>;
+  searchKeyword: string = ''; // Propiedad para manejar el input de búsqueda
 
   constructor(private readonly store: Store, private readonly cartService: CartService) {
     this.products$ = this.store.select(selectAllProducts);
@@ -22,7 +24,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('Dispatching loadProducts');
-    this.store.dispatch(loadProducts());
+    this.store.dispatch(loadProducts({}));
   }
 
   addToCart(product: Product): void {
@@ -33,5 +35,11 @@ export class HomeComponent implements OnInit {
       quantity: 1, // Por defecto, agregar una unidad
     });
     alert(`${product.name} agregado al carrito`);
+  }
+
+  // Método para realizar la búsqueda
+  searchProducts(): void {
+    console.log(`Searching products with keyword: ${this.searchKeyword}`);
+    this.store.dispatch(loadProducts({ keyword: this.searchKeyword }));
   }
 }

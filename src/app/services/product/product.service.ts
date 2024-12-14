@@ -36,11 +36,13 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   // Obtener todos los productos
-  getAllProducts(): Observable<Product[]> {
-    return this.http.get<PaginatedResponse<Product>>(this.apiUrl).pipe(
+  getAllProducts(keyword?: string): Observable<Product[]> {
+    const params = keyword ? { params: { keyword } } : {};
+    return this.http.get<PaginatedResponse<Product>>(this.apiUrl, params).pipe(
       map((response: PaginatedResponse<Product>) => response.content)
     );
   }
+  
 
   // Agregar un nuevo producto
   addProduct(product: Product): Observable<Product> {
