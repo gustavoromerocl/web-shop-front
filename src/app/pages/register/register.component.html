@@ -11,11 +11,19 @@
       />
       <div
         *ngIf="
-          registerForm.get('name')?.invalid && registerForm.get('name')?.touched
+          registerForm.get('name')?.errors && registerForm.get('name')?.touched
         "
         class="text-danger"
       >
-        Name is required (min 3 characters).
+        <div *ngIf="registerForm.get('name')?.errors?.['required']">
+          Name is required.
+        </div>
+        <div *ngIf="registerForm.get('name')?.errors?.['minlength']">
+          Name must be at least 3 characters.
+        </div>
+        <div *ngIf="registerForm.get('name')?.errors?.['pattern']">
+          Name can only contain letters and spaces.
+        </div>
       </div>
     </div>
 
@@ -57,20 +65,25 @@
           Password is required.
         </div>
         <div *ngIf="registerForm.get('password')?.errors?.['minlength']">
-          Password must be at least 6 characters.
+          Password must be at least 8 characters.
         </div>
         <div *ngIf="registerForm.get('password')?.errors?.['uppercase']">
-          Password must contain at least one uppercase letter.
+          Must contain at least one uppercase letter.
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['lowercase']">
+          Must contain at least one lowercase letter.
         </div>
         <div *ngIf="registerForm.get('password')?.errors?.['number']">
-          Password must contain at least one number.
+          Must contain at least one number.
         </div>
         <div *ngIf="registerForm.get('password')?.errors?.['specialCharacter']">
-          Password must contain at least one special character.
+          Must contain at least one special character (!#$%^&*).
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['whitespace']">
+          Cannot contain spaces.
         </div>
       </div>
     </div>
-
     <div class="mb-3">
       <label for="confirmPassword" class="form-label">Confirm Password</label>
       <input

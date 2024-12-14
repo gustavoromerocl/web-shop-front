@@ -30,16 +30,22 @@ export class RegisterComponent {
   ) {
     this.registerForm = this.fb.group(
       {
-        name: ['', [Validators.required, Validators.minLength(3)]],
+        name: ['',       [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.pattern("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"),
+        ],],
         email: ['', [Validators.required, Validators.email]],
         password: [
           '',
           [
             Validators.required,
-            Validators.minLength(6),
+            Validators.minLength(8),
             this.uppercaseValidator(),
+            this.lowercaseValidator(),
             this.numberValidator(),
             this.specialCharacterValidator(),
+            this.noWhitespaceValidator(),
           ],
         ],
         confirmPassword: ['', [Validators.required]],
@@ -76,13 +82,31 @@ export class RegisterComponent {
     };
   }
 
-  // Custom Validator for Special Character
+
+  // Validador para letra minúscula
+  lowercaseValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const hasLowercase = /[a-z]/.test(control.value);
+      return hasLowercase ? null : { lowercase: true };
+    };
+  }
+
+  // Validador para evitar espacios en blanco
+  noWhitespaceValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const hasWhitespace = /\s/.test(control.value);
+      return hasWhitespace ? { whitespace: true } : null;
+    };
+  }
+
+  // Validador actualizado para caracteres especiales
   specialCharacterValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const hasSpecialCharacter = /[@#$%^&*(),.?":{}|<>]/.test(control.value);
+      const hasSpecialCharacter = /[!@#$%^&*]/.test(control.value);
       return hasSpecialCharacter ? null : { specialCharacter: true };
     };
   }
+
 
   onSubmit() {
     if (this.registerForm.valid) {
