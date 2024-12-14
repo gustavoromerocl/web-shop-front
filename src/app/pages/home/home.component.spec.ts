@@ -61,6 +61,6 @@ describe('HomeComponent', () => {
   it('should dispatch loadProducts on initialization', () => {
     const dispatchSpy = spyOn(store, 'dispatch');
     component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(loadProducts());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadProducts({}));
   });
 });

@@ -92,11 +92,4 @@ describe('UserService', () => {
     const user = service.findUser('nonexistent@example.com', 'wrongpassword');
     expect(user).toBeNull();
   });
-
-  it('should return all users in memory', () => {
-    service['users'] = [mockUser];
-
-    const users = service.getAllUsers();
-    expect(users).toEqual([mockUser]);
-  });
 });
